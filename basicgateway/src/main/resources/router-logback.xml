@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>[%d] [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/appl/api-gateway/router/logs/gateway-router.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>/appl/api-gateway/router/logs/rotated/gateway-router.log%d{yyyy-MM-dd}
+			</fileNamePattern>
+			<!-- keep 5 days' worth of history capped at 1GB total size -->
+			<maxHistory>5</maxHistory>
+			<totalSizeCap>1GB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+		    <charset>UTF-8</charset>
+			<pattern>[%d] [%X{X-B3-TraceId}] [%-4relative] [%thread] [%-5level] [%logger{35}] - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	
+	 <appender name="accessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/appl/api-gateway/router/logs/access_log.log</file>
+         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                  <!-- daily rollover -->
+                  <fileNamePattern>/appl/api-gateway/router/logs/rotated/access_log.log%d{yyyy-MM-dd}
+                  </fileNamePattern>
+                  <!-- keep 5 days' worth of history capped at 1GB total size -->
+                  <maxHistory>5</maxHistory>
+                  <totalSizeCap>1GB</totalSizeCap>
+          </rollingPolicy>
+          <encoder>
+             <pattern>[%X{X-B3-TraceId}] %msg%n</pattern>
+          </encoder>
+       </appender>
+       <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+         <appender-ref ref="accessLog" />
+       </appender>
+       <appender name="asyncfile" class="ch.qos.logback.classic.AsyncAppender">
+         <appender-ref ref="FILE" />
+       </appender>
+
+        <logger name="reactor.netty.http.server.AccessLog" level="INFO" additivity="false">
+          <appender-ref ref="async"/>
+        </logger>
+        <logger name="reactor.netty.resources.PooledConnectionProvider" level="DEBUG" />
+        <root level="info">
+            <appender-ref ref="asyncfile" />
+        </root>
+
+</configuration>

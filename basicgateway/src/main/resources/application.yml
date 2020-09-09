@@ -1,0 +1,31 @@
+server:
+  port: 9001
+management:
+  endpoints:
+    web:
+      expose: '*'
+      exposure:
+         include: '*'      
+logging:
+  config: classpath:router-logback.xml
+  level:
+    org:
+      springframework:
+        cloud: INFO
+# App specific properties
+# API Routes
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        ssl:
+          useInsecureTrustManager: true
+      routes:
+      - id: mock
+        uri: http://localhost:9000
+        predicates:
+        - Path=/mock/load
+        - Method=POST
+        filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+        - SecureHeaders

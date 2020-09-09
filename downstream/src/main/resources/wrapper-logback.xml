@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/appl/api-gateway/wrapper/logs/gateway-wrapper.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>/appl/api-gateway/wrapper/logs/rotated/gateway-wrapper.log%d{yyyy-MM-dd}
+			</fileNamePattern>
+			<!-- keep 5 days' worth of history capped at 1GB total size -->
+			<maxHistory>5</maxHistory>
+			<totalSizeCap>1GB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+		    <charset>UTF-8</charset>
+			<pattern>[%d] [%X{X-B3-TraceId}] [%X{requestID}] [%thread] [%-5level] [%logger{35}] - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="downstream" level="DEBUG" />
+	<root level="info">
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>
